@@ -1,6 +1,6 @@
 # Projet de test manuel
 
-Application testée : site d’annonces
+Application testée : www.leboncoin.fr
 
 Fonctionnalités :
 - Inscription
