@@ -1,1 +1,1 @@
-# qa-portfolio
+# naimz26.github.io
