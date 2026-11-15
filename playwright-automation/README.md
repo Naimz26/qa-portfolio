@@ -1,75 +1,77 @@
-# Automatisation des tests — reproduction leboncoin.fr
+# Automatisation des tests avec Playwright
 
-Ce repository présente un projet personnel d'automatisation de tests avec **Playwright**, en complément du projet de test manuel (`manual-testing`). L'objectif : reproduire, sur les mêmes parcours critiques, une suite de tests automatisés maintenable et exécutable en intégration continue.
+Projet personnel d'automatisation de tests de bout en bout avec [Playwright](https://playwright.dev/) (JavaScript), exécuté en intégration continue avec GitHub Actions.
 
-## Objectifs du projet
+## Deux suites, deux objectifs
 
-- Convertir des cas de test manuels en scripts automatisés fiables
-- Couvrir les parcours de navigation et de recherche sans dépendre de comptes utilisateurs
-- Mettre en place une exécution automatique via GitHub Actions (CI)
-- Produire un rapport de test HTML exploitable après chaque exécution
+| Suite | Cible | Exécution | Pourquoi |
+|---|---|---|---|
+| `portfolio` | Le site portfolio de ce dépôt (`index.html`), servi en local | **Automatique** : chaque push sur `main` et chaque pull request | Cible maîtrisée et stable : les résultats reflètent la qualité du code, pas l'état d'un site externe |
+| `leboncoin` | Parcours publics de www.leboncoin.fr | **À la demande** (onglet Actions → *Run workflow* → suite `leboncoin`), non bloquante | Démontrer des tests sur un vrai site en production, sans compte ni action intrusive |
 
-## Application testée
+Chaque suite tourne sur **Chromium, Firefox et un mobile émulé (Pixel 7)**.
 
-[www.leboncoin.fr](https://www.leboncoin.fr)
+## Ce qui est testé
 
-## Périmètre couvert
+**Suite `portfolio`** (`tests/portfolio/`)
+- Structure : titre, sections attendues, intitulé du poste actuel, statut réel des projets.
+- Contenu honnête : absence de statistiques figées, compétences classées par niveau, certifications obtenues et formation en cours distinguées.
+- Encadré « dernière exécution » : affichage des vrais compteurs, d'un échec, et des cas d'erreur (fichier absent, invalide, non JSON, aucun test exécuté).
+- Liens : contact (`mailto:`, `tel:`, LinkedIn), `rel="noopener"` sur les liens externes, liens vers le dépôt qui pointent vers des fichiers existants.
+- Affichage : photo chargée avec texte alternatif, pas d'erreur JavaScript, pas de débordement horizontal (mobile compris), langue déclarée, URL inexistante → 404.
 
-| Fichier | Parcours testé |
+**Suite `leboncoin`** (`tests/leboncoin/`)
+- Accueil : titre, champ de recherche, catégories principales, lien « Déposer une annonce ».
+- Catégories : navigation Véhicules › Voitures, accès direct à Vélos, catégorie inexistante (scénario négatif).
+- Recherche : terme courant (au moins 5 annonces, pas d'état vide), recherche sans résultat (message explicite, aucune annonce), recherche dans une catégorie.
+- Consentement cookies : bandeau accepté s'il apparaît. Un bandeau présent mais impossible à fermer fait échouer le test ; seul son absence est tolérée.
+
+## Bonnes pratiques appliquées
+
+- Sélecteurs accessibles en priorité (`getByRole`, `getByPlaceholder`, `getByText`), sélecteurs CSS seulement en dernier recours.
+- Attentes conditionnelles (`expect(...).toBeVisible()`, `waitFor`) : aucun `waitForTimeout`.
+- Messages d'erreur explicites dans les assertions.
+- Scénarios négatifs dans chaque suite.
+- Nouvelles tentatives en CI signalées comme « instables » (*flaky*), jamais comptées comme réussies du premier coup.
+- Captures d'écran, vidéos et traces conservées en cas d'échec.
+
+## Installation et exécution
+
+Prérequis : Node.js 20 ou plus.
+
+```bash
+cd playwright-automation
+npm ci
+npx playwright install --with-deps chromium firefox
+
+npm test                  # suite portfolio (Chromium, Firefox, mobile)
+npm run test:leboncoin    # suite leboncoin (accès Internet requis)
+npm run test:headed       # portfolio, navigateur visible
+npm run test:ui           # mode interactif
+npm run summary           # résumé JSON du dernier rapport → results/summary.json
+npm run report            # ouvre le dernier rapport HTML
+```
+
+Le serveur local du portfolio (`scripts/serve-portfolio.js`, sans dépendance) démarre automatiquement sur `http://127.0.0.1:4173`.
+
+## Rapports
+
+| Sortie | Emplacement |
 |---|---|
-| `tests/homepage.spec.js` | Chargement de la page d'accueil, présence des éléments clés |
-| `tests/navigation-categories.spec.js` | Navigation dans les catégories (menu et URL directe) |
-| `tests/search.spec.js` | Recherche par mot-clé, gestion des résultats et des cas sans résultat |
+| Rapport HTML | `reports/html/` (artefact `rapport-playwright-*` en CI) |
+| Rapport JSON brut | `reports/results.json` |
+| Résumé (réussis / échoués / instables / ignorés) | `results/summary.json`, affiché sur le portfolio et dans la page de l'exécution GitHub Actions |
+| Traces et captures des échecs | `test-results/` (artefact `traces-echecs-*` en CI) |
 
-> Le périmètre est volontairement limité aux parcours **publics et non-authentifiés** (pas de création de compte, pas de dépôt d'annonce réel), pour rester non-intrusif sur un site en production.
-
-## Stack technique
-
-- [Playwright](https://playwright.dev/) (Node.js)
-- Exécution multi-navigateurs : Chromium, Firefox, Chrome mobile émulé
-- Rapport HTML natif Playwright
-- CI : GitHub Actions
-
-## Structure du projet
-
-```
-playwright-automation/
-├── tests/
-│   ├── helpers.js                 # utilitaires partagés (gestion des cookies)
-│   ├── homepage.spec.js
-│   ├── navigation-categories.spec.js
-│   └── search.spec.js
-├── .github/workflows/playwright.yml
-├── playwright.config.js
-└── package.json
-```
-
-## Lancer les tests en local
-
-```bash
-npm install
-npx playwright install
-npm test
-```
-
-Autres commandes utiles :
-
-```bash
-npm run test:headed   # exécution avec navigateur visible
-npm run test:ui       # mode interactif Playwright UI
-npm run report        # ouvrir le dernier rapport HTML
-```
-
-## Intégration continue
-
-Chaque push sur `main` déclenche automatiquement la suite de tests via GitHub Actions (voir l'onglet **Actions** du repository). Le rapport HTML est disponible en artefact téléchargeable à la fin de chaque exécution.
+Après chaque push sur `main`, le workflow publie le site avec le résumé et le rapport HTML de la suite `portfolio` : l'encadré « dernière exécution » du portfolio affiche donc des résultats réels, ou « Résultats non disponibles » s'ils manquent.
 
 ## Limites connues
 
-Les sélecteurs s'appuient sur les rôles et libellés visibles (bonne pratique Playwright, plus résiliente qu'un sélecteur CSS/XPath), mais restent dépendants de la structure actuelle du site. Une maintenance périodique des tests est nécessaire si l'interface évolue — c'est un point volontairement mis en avant ici, la maintenabilité d'une suite de tests faisant partie intégrante du travail QA.
-
-## Livrables
-
-- Suite de tests automatisés (`tests/`)
-- Pipeline CI (`.github/workflows/playwright.yml`)
-- Rapport d'exécution HTML (généré à chaque run)
+- **leboncoin.fr est un site tiers protégé contre l'automatisation (DataDome).** Depuis les serveurs GitHub Actions, l'accès peut être bloqué. Dans ce cas, le test est marqué **ignoré** avec la raison (« accès bloqué »). Il n'est jamais compté comme réussi, et la protection n'est jamais contournée.
+- L'interface de leboncoin évolue sans préavis : un échec peut venir d'un changement du site plutôt que du code de test. Chaque échec doit être analysé avec la capture et la trace avant d'être classé :
+  - erreur dans le test ;
+  - changement du site ;
+  - problème d'environnement ;
+  - non exécuté.
+- Certains sélecteurs leboncoin (texte de l'état vide, liens d'annonces `/ad/`) n'ont pas encore pu être validés lors d'une exécution réelle. Ils sont à confirmer à la première exécution.
+- Les annonces changent en permanence : les tests vérifient des comportements (présence de résultats, état vide), jamais des annonces précises.

@@ -1,0 +1,22 @@
+# Dépendances
+node_modules/
+
+# Résultats Playwright (générés à chaque exécution, publiés par la CI)
+playwright-automation/test-results/
+playwright-automation/reports/
+playwright-automation/results/
+playwright-automation/blob-report/
+playwright-automation/playwright-report/
+playwright-automation/playwright/.cache/
+/results/
+
+# Environnement et secrets
+.env
+.env.*
+
+# Système / éditeurs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

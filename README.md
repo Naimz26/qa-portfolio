@@ -1,75 +1,79 @@
-# Automatisation des tests — reproduction leboncoin.fr
+# Portfolio QA — Naim Ziani
 
-Ce repository présente un projet personnel d'automatisation de tests avec **Playwright**, en complément du projet de test manuel (`manual-testing`). L'objectif : reproduire, sur les mêmes parcours critiques, une suite de tests automatisés maintenable et exécutable en intégration continue.
+[![Tests Playwright](https://github.com/Naimz26/qa-portfolio/actions/workflows/playwright.yml/badge.svg)](https://github.com/Naimz26/qa-portfolio/actions/workflows/playwright.yml)
 
-## Objectifs du projet
+**QA Tester · Tests fonctionnels, API et automatisation**
 
-- Convertir des cas de test manuels en scripts automatisés fiables
-- Couvrir les parcours de navigation et de recherche sans dépendre de comptes utilisateurs
-- Mettre en place une exécution automatique via GitHub Actions (CI)
-- Produire un rapport de test HTML exploitable après chaque exécution
+Je contribue à améliorer la qualité des applications grâce aux tests fonctionnels, aux tests de régression et à l'automatisation des parcours utilisateurs avec Playwright.
 
-## Application testée
+- **Site du portfolio** : https://naimz26.github.io/qa-portfolio/
+- **Contact** : naim.ziani26@gmail.com · [LinkedIn](https://linkedin.com/in/naim-ziani-7a70235)
 
-[www.leboncoin.fr](https://www.leboncoin.fr)
+## Positionnement
 
-## Périmètre couvert
-
-| Fichier | Parcours testé |
+| Expérience professionnelle | Projets personnels (ce dépôt) |
 |---|---|
-| `tests/homepage.spec.js` | Chargement de la page d'accueil, présence des éléments clés |
-| `tests/navigation-categories.spec.js` | Navigation dans les catégories (menu et URL directe) |
-| `tests/search.spec.js` | Recherche par mot-clé, gestion des résultats et des cas sans résultat |
+| **Testeur logiciel manuel — Rhôn'Telecom**, depuis septembre 2023, sur les outils de production SFR (workflows, portail Fibre) : analyse des fonctionnalités, cas de tests dans **Xray**, campagnes de tests manuels, **non-régression**, anomalies déclarées et suivies dans **Jira**. | Automatisation de parcours avec **Playwright**, intégration continue **GitHub Actions**, démarche de test manuel documentée, projet de tests API en préparation. |
 
-> Le périmètre est volontairement limité aux parcours **publics et non-authentifiés** (pas de création de compte, pas de dépôt d'annonce réel), pour rester non-intrusif sur un site en production.
+Les documents produits en entreprise sont confidentiels : ce dépôt ne contient que des projets personnels.
 
-## Stack technique
+## Compétences réellement démontrées
 
-- [Playwright](https://playwright.dev/) (Node.js)
-- Exécution multi-navigateurs : Chromium, Firefox, Chrome mobile émulé
-- Rapport HTML natif Playwright
-- CI : GitHub Actions
+| Niveau | Compétences | Preuve |
+|---|---|---|
+| Pratiquées en entreprise | Rédaction et exécution de cas de tests, tests fonctionnels et de non-régression, qualification et suivi des anomalies, Jira, Xray | Expérience Rhôn'Telecom (depuis 2023) |
+| Pratiquées en projet | Playwright (JavaScript), GitHub Actions, Git | [`playwright-automation/`](playwright-automation), [workflow](.github/workflows/playwright.yml) |
+| Connaissances | Techniques de conception de tests, Agile/Scrum | ISTQB Fondation (2023), PSPO I (2023) |
+| En cours d'apprentissage | Tests API (Postman), Selenium, Cypress, Python, SQL, sécurité applicative | Formation JEDHA en cours, [`api-testing/`](api-testing) à réaliser |
 
-## Structure du projet
+## Projets
 
-```
-playwright-automation/
-├── tests/
-│   ├── helpers.js                 # utilitaires partagés (gestion des cookies)
-│   ├── homepage.spec.js
-│   ├── navigation-categories.spec.js
-│   └── search.spec.js
-├── .github/workflows/playwright.yml
-├── playwright.config.js
-└── package.json
-```
+| Projet | Statut | Dossier |
+|---|---|---|
+| Automatisation de tests avec Playwright : suite du portfolio (CI) et parcours publics leboncoin.fr (à la demande) | Réalisé | [`playwright-automation/`](playwright-automation) |
+| Tests fonctionnels et rapports d'anomalies : plan de test, 11 cas de test, modèle de rapport d'anomalie, rapport de campagne | Préparé, campagne non exécutée | [`manual-testing/`](manual-testing) |
+| Tests API avec Postman | À réaliser (plan et scénarios prévus) | [`api-testing/`](api-testing) |
+| Sécurité applicative (complément) | En cours de formation, aucun livrable publié | — |
 
-## Lancer les tests en local
+## Installation et exécution des tests
 
 ```bash
-npm install
-npx playwright install
-npm test
+git clone https://github.com/Naimz26/qa-portfolio.git
+cd qa-portfolio/playwright-automation
+npm ci
+npx playwright install --with-deps chromium firefox
+npm test                 # suite portfolio
+npm run test:leboncoin   # suite leboncoin (site tiers)
 ```
 
-Autres commandes utiles :
+Détails, scénarios et bonnes pratiques : [`playwright-automation/README.md`](playwright-automation/README.md).
 
-```bash
-npm run test:headed   # exécution avec navigateur visible
-npm run test:ui       # mode interactif Playwright UI
-npm run report        # ouvrir le dernier rapport HTML
+## Accès aux rapports
+
+- **Sur le portfolio** : l'encadré « dernière exécution » affiche les résultats de la dernière exécution CI de la suite `portfolio` (réussis, échoués, ignorés, statut), avec un lien vers le rapport HTML Playwright publié.
+- **Sur GitHub** : onglet [Actions](https://github.com/Naimz26/qa-portfolio/actions). Chaque exécution affiche un résumé et propose le rapport HTML en artefact téléchargeable (30 jours).
+- **En local** : `npm run report` après une exécution.
+
+## Architecture du dépôt
+
 ```
-
-## Intégration continue
-
-Chaque push sur `main` déclenche automatiquement la suite de tests via GitHub Actions (voir l'onglet **Actions** du repository). Le rapport HTML est disponible en artefact téléchargeable à la fin de chaque exécution.
+qa-portfolio/
+├── index.html                       # site du portfolio (GitHub Pages)
+├── assets/                          # photo du portfolio
+├── .github/workflows/playwright.yml # CI : tests, rapports, publication du site
+├── playwright-automation/
+│   ├── playwright.config.js         # projets portfolio-* et leboncoin-* (Chromium, Firefox, mobile)
+│   ├── scripts/                     # serveur local du portfolio, résumé des résultats
+│   └── tests/
+│       ├── portfolio/               # cible maîtrisée, exécutée en CI
+│       └── leboncoin/               # site tiers, exécution à la demande
+├── manual-testing/                  # plan de test, cas de test, anomalies, rapport de campagne
+└── api-testing/                     # projet Postman à réaliser (plan)
+```
 
 ## Limites connues
 
-Les sélecteurs s'appuient sur les rôles et libellés visibles (bonne pratique Playwright, plus résiliente qu'un sélecteur CSS/XPath), mais restent dépendants de la structure actuelle du site. Une maintenance périodique des tests est nécessaire si l'interface évolue — c'est un point volontairement mis en avant ici, la maintenabilité d'une suite de tests faisant partie intégrante du travail QA.
-
-## Livrables
-
-- Suite de tests automatisés (`tests/`)
-- Pipeline CI (`.github/workflows/playwright.yml`)
-- Rapport d'exécution HTML (généré à chaque run)
+- La suite `leboncoin` dépend d'un site tiers protégé contre l'automatisation. Un accès bloqué est signalé comme test **ignoré**, jamais comme réussi ; aucune protection n'est contournée.
+- La campagne de tests manuels est préparée mais **pas encore exécutée** : aucun résultat n'est donc présenté.
+- Les fiches d'anomalies sont des **exemples pédagogiques**, signalés comme tels.
+- Le projet de tests API n'est pas encore réalisé.
