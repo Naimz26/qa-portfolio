@@ -16,7 +16,9 @@ test.describe('Portfolio — en-tête et positionnement', () => {
     const h1 = page.getByRole('heading', { level: 1 });
     await expect(h1, 'La page doit avoir un seul titre principal').toHaveCount(1);
     await expect(h1).toHaveText('Naim Ziani');
-    await expect(page.getByText('QA Tester · Tests fonctionnels, API et automatisation')).toBeVisible();
+    const role = page.locator('.hero .role');
+    await expect(role).toContainText('QA Tester');
+    await expect(role).toContainText('Tests fonctionnels, API et automatisation');
   });
 
   test('toutes les sections attendues sont présentes', async ({ page }) => {
@@ -28,7 +30,7 @@ test.describe('Portfolio — en-tête et positionnement', () => {
   test('l\'expérience actuelle affiche l\'intitulé réel du poste', async ({ page }) => {
     const experience = page.locator('#experience');
     await expect(experience.getByRole('heading', { level: 3, name: /Testeur logiciel manuel/ })).toBeVisible();
-    await expect(experience).toContainText("Septembre 2023 – Aujourd'hui");
+    await expect(experience).toContainText("Septembre 2023 – aujourd'hui");
     await expect(experience).toContainText("Rhôn'Telecom");
     await expect(experience).toContainText('Xray');
     await expect(experience).toContainText('Jira');
@@ -50,10 +52,10 @@ test.describe('Portfolio — projets et compétences', () => {
   test('les quatre projets sont présentés avec leur statut réel', async ({ page }) => {
     const projets = page.locator('#projets');
     await expect(projets.locator('.ticket')).toHaveCount(4);
-    await expect(page.locator('#proj-playwright')).toContainText('PROJET PERSONNEL');
-    await expect(page.locator('#proj-api'), 'Le projet API n\'existe pas encore : il doit être marqué « À RÉALISER »').toContainText('À RÉALISER');
+    await expect(page.locator('#proj-playwright')).toContainText('Réalisé, projet personnel');
+    await expect(page.locator('#proj-api'), 'Le projet API n\'existe pas encore : il doit être marqué « À réaliser »').toContainText('À réaliser');
     await expect(page.locator('#proj-api')).toContainText('Aucun pour l\'instant');
-    await expect(page.locator('#proj-securite')).toContainText('EN COURS DE FORMATION');
+    await expect(page.locator('#proj-securite')).toContainText('En cours de formation');
   });
 
   test('chaque projet décrit au minimum son objectif, son contexte et ses outils', async ({ page }) => {
