@@ -1,14 +1,22 @@
 {
   "name": "qa-automation-playwright",
-  "version": "1.0.0",
-  "description": "Suite de tests automatisés Playwright - reproduction leboncoin.fr (projet personnel QA)",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Tests automatisés Playwright : site portfolio (cible maîtrisée, CI) et parcours publics de leboncoin.fr (site tiers, à la demande)",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "test": "playwright test",
-    "test:headed": "playwright test --headed",
+    "test": "playwright test --project=portfolio-*",
+    "test:portfolio": "playwright test --project=portfolio-*",
+    "test:leboncoin": "playwright test --project=leboncoin-*",
+    "test:all": "playwright test",
+    "test:headed": "playwright test --project=portfolio-chromium --headed",
     "test:ui": "playwright test --ui",
-    "report": "playwright show-report"
+    "summary": "node scripts/summarize-results.js",
+    "report": "playwright show-report reports/html"
   },
   "devDependencies": {
-    "@playwright/test": "^1.48.0"
+    "@playwright/test": "1.63.0"
   }
 }

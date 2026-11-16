@@ -1,0 +1,184 @@
+name: Tests Playwright
+
+# - Suite « portfolio » : à chaque push sur main et à chaque pull request (cible maîtrisée).
+# - Suite « leboncoin » : uniquement à la demande (site tiers protégé contre l'automatisation), non bloquante.
+# - Publication du site (GitHub Pages) après chaque push sur main, avec le résumé et le rapport HTML
+#   de la suite portfolio, que les tests aient réussi ou échoué.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: Suite à exécuter
+        type: choice
+        options: [portfolio, leboncoin, toutes]
+        default: portfolio
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playwright-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: playwright-automation
+
+jobs:
+  portfolio:
+    name: Suite portfolio (Chromium, Firefox, mobile)
+    if: github.event_name != 'workflow_dispatch' || inputs.suite != 'leboncoin'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: playwright-automation/package-lock.json
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Installer les navigateurs Playwright
+        run: npx playwright install --with-deps chromium firefox
+
+      - name: Exécuter les tests
+        id: tests
+        continue-on-error: true
+        run: npx playwright test --project='portfolio-*'
+
+      - name: Produire le résumé des résultats
+        if: always()
+        run: node scripts/summarize-results.js portfolio
+
+      - name: Ajouter le résumé à la page de l'exécution
+        if: always()
+        run: |
+          {
+            echo "### Suite portfolio"
+            echo '```json'
+            cat results/summary.json 2>/dev/null || echo '{"status":"not_run"}'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publier le rapport HTML et les résultats (artefacts)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-playwright-portfolio
+          path: |
+            playwright-automation/reports/
+            playwright-automation/results/
+          retention-days: 30
+
+      - name: Publier les traces et captures des échecs
+        if: steps.tests.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: traces-echecs-portfolio
+          path: playwright-automation/test-results/
+          retention-days: 14
+
+      - name: Préparer le site à publier
+        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        working-directory: .
+        run: |
+          mkdir -p _site/results _site/report
+          cp index.html _site/
+          cp -r assets _site/
+          cp playwright-automation/results/summary.json _site/results/ 2>/dev/null || true
+          cp -r playwright-automation/reports/html/. _site/report/ 2>/dev/null || true
+
+      - name: Envoyer le site à GitHub Pages
+        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      # Le job échoue si au moins un test a échoué : le résultat n'est jamais masqué.
+      - name: Statut final de la suite
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "::error::Au moins un test de la suite portfolio a échoué. Voir le rapport HTML."
+          exit 1
+
+  deploy:
+    name: Publication GitHub Pages
+    needs: portfolio
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.portfolio.result != 'cancelled' && needs.portfolio.result != 'skipped'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  leboncoin:
+    name: Suite leboncoin (site tiers, à la demande)
+    if: github.event_name == 'workflow_dispatch' && (inputs.suite == 'leboncoin' || inputs.suite == 'toutes')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Site externe : un blocage ou un changement d'interface ne doit pas bloquer le dépôt.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: playwright-automation/package-lock.json
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Installer les navigateurs Playwright
+        run: npx playwright install --with-deps chromium firefox
+
+      - name: Exécuter les tests
+        id: tests
+        continue-on-error: true
+        run: npx playwright test --project='leboncoin-*'
+
+      - name: Produire le résumé des résultats
+        if: always()
+        run: node scripts/summarize-results.js leboncoin
+
+      - name: Ajouter le résumé à la page de l'exécution
+        if: always()
+        run: |
+          {
+            echo "### Suite leboncoin (site tiers)"
+            echo "Les tests ignorés correspondent à un accès bloqué par la protection anti-robots du site (voir annotations du rapport)."
+            echo '```json'
+            cat results/summary.json 2>/dev/null || echo '{"status":"not_run"}'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publier le rapport HTML, les résultats et les traces (artefacts)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-playwright-leboncoin
+          path: |
+            playwright-automation/reports/
+            playwright-automation/results/
+            playwright-automation/test-results/
+          retention-days: 30
+
+      - name: Statut final de la suite
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "::error::Au moins un test de la suite leboncoin a échoué (code, changement du site ou environnement : voir le rapport)."
+          exit 1
