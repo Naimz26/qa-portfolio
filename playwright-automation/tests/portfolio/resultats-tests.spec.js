@@ -32,14 +32,16 @@ async function openWith(page, fulfill) {
 test.describe('Portfolio — affichage des résultats de tests', () => {
   test('affiche les compteurs réels d\'une exécution réussie', async ({ page }) => {
     const results = await openWith(page, (route) => route.fulfill({ json: summary() }));
-    await expect(results.locator('[data-field="passed"]')).toHaveText(/tests réussis \.+ 30$/);
-    await expect(results.locator('[data-field="failed"]')).toHaveText(/tests échoués \.+ 0$/);
-    await expect(results.locator('[data-field="skipped"]')).toHaveText(/tests ignorés \.+ 3$/);
+    await expect(results.locator('[data-field="passed"]')).toHaveText('30');
+    await expect(results.locator('[data-field="failed"]')).toHaveText('0');
+    await expect(results.locator('[data-field="skipped"]')).toHaveText('3');
     await expect(results.locator('[data-field="date"]')).toContainText('15/11/2026 22:10');
     await expect(results.locator('[data-field="date"]')).toContainText('commit abc1234');
-    await expect(results.locator('[data-field="status"]')).toHaveText('PIPELINE : SUCCÈS — 30/30 réussis');
-    await expect(results.getByRole('link', { name: /rapport HTML Playwright/ })).toHaveAttribute('href', 'report/index.html');
-    await expect(results.getByRole('link', { name: /détail de l.exécution/ })).toHaveAttribute('href', /actions\/runs\/1$/);
+    await expect(results.locator('[data-field="status"]')).toHaveText('Pipeline réussi : 30/30 tests réussis');
+    await expect(page.locator('#run-status')).toHaveText('Réussi');
+    await expect(page.locator('#run-status')).toHaveAttribute('data-status', 'passed');
+    await expect(results.getByRole('link', { name: 'Ouvrir le rapport Playwright' })).toHaveAttribute('href', 'report/index.html');
+    await expect(results.getByRole('link', { name: /Voir l.exécution sur GitHub/ })).toHaveAttribute('href', /actions\/runs\/1$/);
     await expect(page.locator('#stat-tests')).toHaveText('33');
   });
 
@@ -47,9 +49,11 @@ test.describe('Portfolio — affichage des résultats de tests', () => {
     const results = await openWith(page, (route) =>
       route.fulfill({ json: summary({ status: 'failed', totals: { passed: 27, failed: 2, flaky: 1, skipped: 0 } }) }),
     );
-    await expect(results.locator('[data-field="status"]')).toHaveText('PIPELINE : ÉCHEC — 2 échec(s) sur 30 tests');
+    await expect(results.locator('[data-field="status"]')).toHaveText('Pipeline en échec : 2 échec(s) sur 30 tests');
     await expect(results.locator('[data-field="status"]')).toHaveAttribute('data-status', 'failed');
-    await expect(results.locator('[data-field="flaky"]')).toHaveText(/réussis après relance \.+ 1$/);
+    await expect(results.locator('[data-field="failed"]')).toHaveText('2');
+    await expect(results.locator('[data-field="flaky"]')).toContainText('1 test(s) réussi(s) seulement après relance');
+    await expect(page.locator('#run-status')).toHaveText('En échec');
   });
 
   test('affiche « Résultats non disponibles » si aucun résultat n\'est publié', async ({ page }) => {
@@ -57,6 +61,7 @@ test.describe('Portfolio — affichage des résultats de tests', () => {
     await expect(results.locator('[data-state="unavailable"]')).toHaveText(/^Résultats non disponibles : tests non exécutés/);
     await expect(results.locator('[data-field]')).toHaveCount(0);
     await expect(page.locator('#stat-tests')).toHaveText('—');
+    await expect(page.locator('#run-status')).toHaveText('Non disponible');
   });
 
   test('refuse un fichier de résultats invalide plutôt que d\'afficher des valeurs douteuses', async ({ page }) => {

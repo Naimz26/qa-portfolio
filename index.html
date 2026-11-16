@@ -3,821 +3,543 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Naim Ziani — QA Tester · Tests fonctionnels et automatisation</title>
-<meta name="description" content="Portfolio de Naim Ziani, testeur logiciel QA : tests fonctionnels, non-régression, Jira/Xray, automatisation avec Playwright.">
+<title>Naim Ziani — QA Tester, tests fonctionnels et automatisation</title>
+<meta name="description" content="Portfolio de Naim Ziani, testeur logiciel QA : tests fonctionnels, non-régression, Jira et Xray, automatisation avec Playwright.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#F2EFE8;
-    --paper-raised:#FBFAF6;
-    --ink:#1C1E1B;
-    --ink-soft:#5B5D57;
-    --line:#D8D3C4;
-    --verified:#2F6F5E;
-    --verified-bg:#E4EEE9;
-    --amber:#B9752B;
-    --amber-bg:#F4E7D6;
-    --max-w:920px;
+    --paper:#F5F7FA;
+    --surface:#FFFFFF;
+    --ink:#13233B;
+    --ink-2:#33445C;
+    --muted:#5B6B82;
+    --line:#D9E0EA;
+    --pass:#17865A;
+    --pass-bg:#E5F3EC;
+    --known:#9A6514;
+    --known-bg:#FBF0DC;
+    --learn:#5C6E89;
+    --learn-bg:#E9EEF5;
+    --fail:#C2413A;
+    --display:'Bricolage Grotesque', 'Segoe UI', sans-serif;
+    --body:'Instrument Sans', 'Segoe UI', system-ui, sans-serif;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
+    --wrap:1120px;
   }
   *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'IBM Plex Sans',sans-serif;
-    font-size:16px;
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-  }
-  a{color:var(--verified);}
-  ::selection{background:var(--verified-bg);color:var(--verified);}
+  html{scroll-behavior:smooth;scroll-padding-top:80px;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  a:focus-visible,button:focus-visible{outline:3px solid var(--pass);outline-offset:3px;border-radius:6px;}
+  .wrap{max-width:var(--wrap);margin:0 auto;padding:0 28px;}
+  h1,h2,h3{font-family:var(--display);color:var(--ink);margin:0;}
 
-  .wrap{max-width:var(--max-w);margin:0 auto;padding:0 28px;}
+  /* ---------- Navigation ---------- */
+  .topbar{position:sticky;top:0;z-index:10;background:rgba(245,247,250,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:24px;}
+  .brand{font-family:var(--display);font-weight:700;font-size:1.1rem;text-decoration:none;}
+  .topbar nav{display:flex;gap:26px;font-size:.95rem;}
+  .topbar nav a{text-decoration:none;color:var(--ink-2);}
+  .topbar nav a:hover{color:var(--ink);text-decoration:underline;text-underline-offset:4px;}
+  .topbar .nav-cta{color:var(--surface);background:var(--ink);padding:8px 16px;border-radius:999px;font-weight:600;}
+  .topbar .nav-cta:hover{color:var(--surface);text-decoration:none;background:#203656;}
 
-  /* ---------- header / masthead ---------- */
-  header.masthead{
-    border-bottom:1.5px solid var(--ink);
-    padding:56px 0 28px;
-    opacity:0;
-    transform:translateY(10px);
-    animation:riseIn .7s ease-out forwards;
-  }
-  @keyframes riseIn{to{opacity:1;transform:translateY(0);}}
-  @media (prefers-reduced-motion: reduce){
-    header.masthead{animation:none;opacity:1;transform:none;}
-  }
-  .masthead-row{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    gap:32px;
-    flex-wrap:wrap;
-  }
-  .id-photo{
-    width:76px;height:76px;
-    border-radius:6px;
-    object-fit:cover;
-    border:1.5px solid var(--ink);
-    flex-shrink:0;
-  }
-  .masthead-title{display:flex;gap:18px;align-items:center;}
-  .masthead-title h1{
-    font-family:'Source Serif 4',serif;
-    font-weight:600;
-    font-size:clamp(2.1rem, 5vw, 3rem);
-    margin:0 0 4px;
-    letter-spacing:-0.01em;
-  }
-  .masthead-title .role{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.95rem;
-    color:var(--ink-soft);
-  }
-  .status-tag{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.72rem;
-    letter-spacing:0.04em;
-    color:var(--verified);
-    background:var(--verified-bg);
-    border:1px solid var(--verified);
-    border-radius:3px;
-    padding:4px 9px;
-    white-space:nowrap;
-    align-self:flex-start;
+  /* ---------- Accroche ---------- */
+  .hero{padding:72px 0 56px;}
+  .hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;}
+  .hero-id{display:flex;align-items:center;gap:16px;margin-bottom:28px;}
+  .id-photo{width:76px;height:76px;border-radius:50%;object-fit:cover;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line);}
+  .availability{display:inline-flex;align-items:center;gap:8px;font-size:.92rem;font-weight:500;color:var(--pass);background:var(--pass-bg);padding:5px 12px;border-radius:999px;}
+  .availability::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--pass);}
+  .hero h1{font-size:clamp(3rem,7.4vw,5.6rem);font-weight:800;line-height:.95;letter-spacing:-.035em;}
+  .hero .role{font-family:var(--display);font-weight:500;font-size:clamp(1.35rem,2.6vw,1.9rem);line-height:1.25;color:var(--ink-2);margin:18px 0 0;letter-spacing:-.01em;}
+  .hero .role strong{display:block;font-weight:700;color:var(--ink);}
+  .hero .pitch{max-width:34em;margin:22px 0 32px;color:var(--ink-2);font-size:1.08rem;}
+  .actions{display:flex;flex-wrap:wrap;gap:12px;}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:999px;font-weight:600;text-decoration:none;font-size:1rem;border:1.5px solid var(--ink);}
+  .btn-primary{background:var(--ink);color:var(--surface);}
+  .btn-primary:hover{background:#203656;}
+  .btn-ghost:hover{background:var(--surface);}
+
+  /* Rapport d'exécution : l'élément central de la page */
+  .run{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 24px 48px -28px rgba(19,35,59,.35);}
+  .run-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:20px 22px 0;}
+  .run-head h2{font-size:1.15rem;font-weight:700;line-height:1.3;}
+  .run-head p{margin:2px 0 0;font-size:.88rem;color:var(--muted);}
+  .run-status{flex:none;font-size:.85rem;font-weight:600;padding:5px 12px;border-radius:999px;background:var(--learn-bg);color:var(--learn);white-space:nowrap;}
+  .run-status[data-status="passed"]{background:var(--pass-bg);color:var(--pass);}
+  .run-status[data-status="failed"]{background:#F8E3E1;color:var(--fail);}
+  .run-counts{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:22px 22px 0;border:1px solid var(--line);border-radius:12px;}
+  .run-count{padding:14px 16px;}
+  .run-count + .run-count{border-left:1px solid var(--line);}
+  .run-count .n{font-family:var(--display);font-weight:700;font-size:2.4rem;line-height:1;font-variant-numeric:tabular-nums;}
+  .run-count .l{font-size:.88rem;color:var(--muted);margin-top:6px;}
+  .run-count.is-pass .n{color:var(--pass);}
+  .run-count.is-fail .n{color:var(--fail);}
+  .run-count.is-zero .n{color:var(--ink);}
+  .run-bar{display:flex;height:8px;margin:18px 22px 0;border-radius:999px;overflow:hidden;background:var(--learn-bg);}
+  .run-bar span{display:block;height:100%;transform-origin:left;}
+  .run-bar .b-pass{background:var(--pass);} .run-bar .b-fail{background:var(--fail);} .run-bar .b-skip{background:#B7C2D3;}
+  .run-log{margin:18px 0 0;padding:16px 22px;background:#0F1C30;color:#C9D4E4;font-family:var(--mono);font-size:.8rem;line-height:1.7;}
+  .run-log .ok{color:#7FD3A7;} .run-log .ko{color:#F09A92;} .run-log .dim{color:#8496B0;}
+  .run-foot{display:flex;flex-wrap:wrap;gap:18px;padding:14px 22px 18px;font-size:.92rem;}
+  .run-foot a{font-weight:600;text-underline-offset:4px;}
+  .run-empty{padding:20px 22px;color:var(--ink-2);}
+  @media (prefers-reduced-motion:no-preference){
+    .run-bar span{animation:grow .9s cubic-bezier(.2,.7,.2,1) both;}
+    @keyframes grow{from{transform:scaleX(0);}to{transform:scaleX(1);}}
   }
 
-  .meta-table{
-    margin-top:28px;
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:18px 24px;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.82rem;
-  }
-  .meta-table dt{color:var(--ink-soft);margin-bottom:3px;}
-  .meta-table dd{margin:0;color:var(--ink);}
-  .meta-table a{color:var(--ink);text-decoration-color:var(--line);}
-  .meta-table a:hover{color:var(--verified);}
+  /* Preuves rapides */
+  .proofs{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface);}
+  .proofs .wrap{display:grid;grid-template-columns:repeat(4,1fr);}
+  .proof{padding:22px 24px 22px 0;}
+  .proof + .proof{padding-left:24px;border-left:1px solid var(--line);}
+  .proof .num{font-family:var(--display);font-weight:700;font-size:1.7rem;line-height:1.1;}
+  .proof .label{font-size:.92rem;color:var(--muted);margin-top:4px;}
 
-  @media (max-width:640px){
-    .meta-table{grid-template-columns:1fr 1fr;}
-  }
+  /* ---------- Sections ---------- */
+  section.block{padding:84px 0 0;}
+  .block-head{margin-bottom:30px;max-width:46em;}
+  .block-head h2{font-size:clamp(1.9rem,3.6vw,2.6rem);font-weight:700;letter-spacing:-.025em;line-height:1.05;}
+  .block-head p{margin:10px 0 0;color:var(--muted);font-size:1.05rem;}
+  .block-body{max-width:900px;}
 
-  /* ---------- terminal hero widget ---------- */
-  .terminal{
-    margin-top:32px;
-    background:#191C1A;
-    border-radius:8px;
-    overflow:hidden;
-    box-shadow:0 14px 30px -14px rgba(0,0,0,0.35);
-  }
-  .terminal-bar{
-    display:flex;
-    align-items:center;
-    gap:7px;
-    padding:11px 14px;
-    background:#22251F;
-    border-bottom:1px solid #2E3128;
-  }
-  .terminal-dot{width:10px;height:10px;border-radius:50%;background:#494C43;}
-  .terminal-bar span.fname{
-    margin-left:8px;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.74rem;
-    color:#8B8E82;
-  }
-  .terminal-body{
-    padding:20px 22px 24px;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.86rem;
-    line-height:1.85;
-    color:#C9CBBF;
-    min-height:196px;
-  }
-  .terminal-body .prompt{color:#7FA88F;}
-  .terminal-line{opacity:0;white-space:pre-wrap;}
-  .terminal-line.pass::before{content:"✓ ";color:#7FBE9C;}
-  .terminal-line.summary{color:#7FBE9C;font-weight:600;margin-top:6px;}
-  .terminal-line.fail::before{content:"✗ ";color:#E08A7B;}
-  .terminal-line.summary.is-failed{color:#E08A7B;}
-  .terminal-line.muted{color:#8B8E82;}
-  .terminal-links{margin-top:10px;display:flex;gap:18px;flex-wrap:wrap;}
-  .terminal-links a{color:#C9CBBF;text-decoration:none;border-bottom:1px solid #494C43;}
-  .terminal-links a:hover{color:#7FBE9C;border-color:#7FBE9C;}
-  .cursor{
-    display:inline-block;width:7px;height:15px;
-    background:#7FBE9C;
-    vertical-align:text-bottom;
-    animation:blink 1s steps(1) infinite;
-  }
-  @keyframes blink{50%{opacity:0;}}
-  @media (prefers-reduced-motion: reduce){
-    .terminal-line{opacity:1 !important;}
-    .cursor{display:none;}
-  }
+  .profile-text{font-size:1.15rem;line-height:1.7;color:var(--ink-2);max-width:36em;margin:0;}
+  .profile-text + .profile-text{margin-top:16px;}
 
-  /* ---------- stats strip ---------- */
-  .stats-strip{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:0;
-    margin-top:36px;
-    border-top:1px solid var(--line);
-  }
-  .stat{
-    padding:20px 18px 4px 0;
-    border-right:1px solid var(--line);
-  }
-  .stat:last-child{border-right:none;}
-  .stat .num{
-    font-family:'Source Serif 4',serif;
-    font-weight:600;
-    font-size:2.1rem;
-    line-height:1;
-    color:var(--ink);
-  }
-  .stat .label{
-    margin-top:6px;
-    font-size:0.8rem;
-    color:var(--ink-soft);
-    line-height:1.35;
-  }
-  @media (max-width:640px){
-    .stats-strip{grid-template-columns:1fr 1fr;row-gap:20px;}
-    .stat{border-right:none;padding-right:0;}
-  }
+  /* Statuts : la couleur encode toujours la même information */
+  .pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--body);font-size:.82rem;font-weight:600;padding:3px 11px;border-radius:999px;white-space:nowrap;vertical-align:middle;letter-spacing:0;}
+  .pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;}
+  .pill.pass{color:var(--pass);background:var(--pass-bg);}
+  .pill.known{color:var(--known);background:var(--known-bg);}
+  .pill.learn{color:var(--learn);background:var(--learn-bg);}
 
-  /* ---------- sections ---------- */
-  section{padding:44px 0;border-bottom:1px solid var(--line);}
-  section:last-of-type{border-bottom:none;}
+  /* Expérience : frise */
+  .timeline{position:relative;}
+  .ticket.job{position:relative;padding:0 0 40px 34px;}
+  .ticket.job::before{content:"";position:absolute;left:6px;top:12px;bottom:0;width:2px;background:var(--line);}
+  .ticket.job:last-child::before{display:none;}
+  .ticket.job::after{content:"";position:absolute;left:0;top:6px;width:14px;height:14px;border-radius:50%;background:var(--surface);border:2px solid var(--muted);}
+  .ticket.job.current::after{background:var(--pass);border-color:var(--pass);box-shadow:0 0 0 5px var(--pass-bg);}
+  .job-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 16px;}
+  .job-head h3{font-size:1.45rem;font-weight:700;letter-spacing:-.01em;}
+  .job-dates{color:var(--muted);font-size:.95rem;}
+  .job-org{color:var(--ink-2);margin:4px 0 12px;font-weight:500;}
+  .job ul{margin:0;padding:0;list-style:none;display:grid;gap:7px;}
+  .job li{position:relative;padding-left:22px;color:var(--ink-2);}
+  .job li::before{content:"✓";position:absolute;left:0;color:var(--pass);font-weight:700;}
+  .job.past li::before{content:"–";color:var(--muted);}
+  .job-env{margin:14px 0 0;font-size:.93rem;color:var(--muted);}
+  .current-panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px 28px;}
 
-  .section-head{
-    display:flex;
-    align-items:baseline;
-    gap:14px;
-    margin-bottom:22px;
-  }
-  .section-num{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.78rem;
-    color:var(--ink-soft);
-  }
-  .section-head h2{
-    font-family:'Source Serif 4',serif;
-    font-weight:600;
-    font-size:1.5rem;
-    margin:0;
-  }
+  /* Projets */
+  .projects{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .ticket.project{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px 26px 22px;display:flex;flex-direction:column;}
+  .ticket.project.featured{grid-column:1 / -1;border-left:5px solid var(--pass);}
+  .ticket.project.planned{background:transparent;border-style:dashed;}
+  .project h3{font-size:1.3rem;font-weight:700;line-height:1.25;margin-top:10px;}
+  .project.featured h3{font-size:1.6rem;}
+  .proj-fields{margin:14px 0 18px;font-size:.95rem;}
+  .proj-fields dt{color:var(--muted);font-weight:500;font-size:.88rem;margin-top:10px;}
+  .proj-fields dd{margin:2px 0 0;color:var(--ink-2);}
+  .project.featured .proj-fields{display:grid;grid-template-columns:118px 1fr;gap:8px 18px;max-width:62em;}
+  .project.featured .proj-fields dt{margin-top:0;font-size:.95rem;}
+  .project.featured .proj-fields dd{margin:0;}
+  .proj-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto;}
+  .proj-link{font-size:.92rem;font-weight:600;text-decoration:none;padding:7px 14px;border-radius:999px;border:1.5px solid var(--line);}
+  .proj-link:hover{border-color:var(--ink);}
 
-  .profile-text{
-    max-width:68ch;
-    font-size:1.05rem;
-    color:#2B2D29;
-  }
+  /* Compétences */
+  .skill-legend{display:flex;flex-wrap:wrap;gap:10px 18px;margin:0 0 26px;font-size:.92rem;color:var(--muted);}
+  .skills{display:grid;grid-template-columns:1fr 1fr;gap:30px 40px;}
+  .skill-cat{font-family:var(--display);font-size:1.12rem;font-weight:700;margin:0 0 12px;display:flex;align-items:center;gap:10px;}
+  .skill-grid{display:grid;gap:8px;}
+  .skill-item{display:flex;gap:12px;align-items:flex-start;padding:10px 14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;font-size:.96rem;}
+  .skill-item .mark{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:.72rem;font-weight:700;color:var(--surface);background:var(--pass);margin-top:2px;}
+  .skill-item.known .mark{background:var(--known);}
+  .skill-item.learning{background:transparent;border-style:dashed;}
+  .skill-item.learning .mark{background:transparent;color:var(--learn);border:1.5px solid var(--learn);}
 
-  /* ---------- skills checklist ---------- */
-  .skill-grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:10px 28px;
-  }
-  @media (max-width:640px){.skill-grid{grid-template-columns:1fr;}}
-  .skill-item{
-    display:flex;
-    align-items:baseline;
-    gap:10px;
-    font-size:0.96rem;
-    padding:7px 0;
-    border-bottom:1px dotted var(--line);
-  }
-  .skill-item .mark{
-    font-family:'IBM Plex Mono',monospace;
-    color:var(--verified);
-    font-size:0.85rem;
-  }
-
-  /* ---------- experience tickets ---------- */
-  .ticket{
-    border:1px solid var(--line);
-    background:var(--paper-raised);
-    border-radius:5px;
-    padding:22px 24px;
-    margin-bottom:18px;
-    transition:border-color .15s ease;
-  }
-  .ticket:hover{border-color:var(--ink);}
-  .ticket-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:16px;
-    flex-wrap:wrap;
-    margin-bottom:4px;
-  }
-  .ticket-id{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.78rem;
-    color:var(--ink-soft);
-    margin-bottom:6px;
-    display:block;
-  }
-  .ticket-title{
-    font-family:'Source Serif 4',serif;
-    font-weight:600;
-    font-size:1.18rem;
-    margin:0;
-  }
-  .ticket-dates{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.8rem;
-    color:var(--ink-soft);
-    white-space:nowrap;
-    padding-top:2px;
-  }
-  .ticket-org{
-    font-size:0.92rem;
-    color:var(--ink-soft);
-    margin:2px 0 14px;
-  }
-  .ticket-status{
-    display:inline-block;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.68rem;
-    letter-spacing:0.03em;
-    padding:2px 8px;
-    border-radius:3px;
-    margin-left:10px;
-    position:relative;
-    top:-2px;
-  }
-  .status-active{color:var(--verified);background:var(--verified-bg);border:1px solid var(--verified);}
-  .status-done{color:var(--ink-soft);background:transparent;border:1px solid var(--line);}
-  .ticket ul{margin:0;padding-left:20px;}
-  .ticket li{margin-bottom:6px;font-size:0.95rem;color:#2B2D29;}
-  .ticket li::marker{color:var(--verified);}
-
-  /* ---------- project card ---------- */
-  .proj-badge{
-    display:inline-block;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.68rem;
-    letter-spacing:0.03em;
-    color:var(--amber);
-    background:var(--amber-bg);
-    border:1px solid var(--amber);
-    border-radius:3px;
-    padding:2px 8px;
-    margin-left:10px;
-    position:relative;
-    top:-2px;
-  }
-  .proj-list{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:6px 24px;
-    margin:14px 0 18px;
-    padding:0;
-    list-style:none;
-  }
-  @media (max-width:640px){.proj-list{grid-template-columns:1fr;}}
-  .proj-list li{
-    font-size:0.9rem;
-    color:#2B2D29;
-    padding-left:16px;
-    position:relative;
-  }
-  .proj-fields{margin:10px 0 16px;display:grid;grid-template-columns:120px 1fr;gap:8px 18px;font-size:0.93rem;}
-  .proj-fields dt{font-family:'IBM Plex Mono',monospace;font-size:0.76rem;color:var(--ink-soft);padding-top:2px;}
-  .proj-fields dd{margin:0;color:#2B2D29;}
-  @media (max-width:640px){.proj-fields{grid-template-columns:1fr;gap:2px;}.proj-fields dd{margin-bottom:8px;}}
-  .proj-badge.todo{color:var(--ink-soft);background:transparent;border-color:var(--line);}
-  .proj-links{display:flex;gap:18px;flex-wrap:wrap;}
-  .skill-cat{font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:0.78rem;color:var(--ink-soft);margin:22px 0 10px;}
-  .skill-cat:first-of-type{margin-top:0;}
-  .skill-item.known .mark{color:var(--amber);}
-  .skill-item.learning .mark{color:var(--ink-soft);}
-  .skill-legend{font-size:0.85rem;color:var(--ink-soft);margin:14px 0 0;}
-  .proj-list li::before{
-    content:"›";
-    position:absolute;left:0;top:0;
-    color:var(--verified);
-    font-weight:600;
-  }
-  .proj-link{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.82rem;
-    color:var(--ink);
-    text-decoration:none;
-    border-bottom:1px solid var(--ink);
-    padding-bottom:1px;
-  }
-  .proj-link:hover{color:var(--verified);border-color:var(--verified);}
-
-  /* ---------- tools ---------- */
-  .tool-group{margin-bottom:18px;}
-  .tool-group h3{
-    font-family:'IBM Plex Mono',monospace;
-    font-weight:500;
-    font-size:0.78rem;
-    color:var(--ink-soft);
-    margin:0 0 10px;
-  }
+  /* Outils */
+  .tools{display:grid;gap:22px;}
+  .tool-group h3{font-family:var(--body);font-size:.98rem;font-weight:600;color:var(--ink-2);margin:0 0 10px;display:flex;align-items:center;gap:10px;}
   .tool-tags{display:flex;flex-wrap:wrap;gap:8px;}
-  .tool-tag{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.82rem;
-    background:var(--paper-raised);
-    border:1px solid var(--line);
-    border-radius:4px;
-    padding:5px 10px;
-  }
+  .tool-tag{font-size:.93rem;padding:6px 13px;border-radius:8px;background:var(--surface);border:1px solid var(--line);}
+  .tool-group.lvl-pass .tool-tag{border-color:#A9D6BF;}
+  .tool-group.lvl-learn .tool-tag{background:transparent;border-style:dashed;}
 
-  /* ---------- formation timeline ---------- */
-  .timeline{border-left:1.5px solid var(--line);padding-left:22px;margin-left:4px;}
-  .tl-item{position:relative;padding-bottom:22px;}
-  .tl-item:last-child{padding-bottom:0;}
-  .tl-item::before{
-    content:"";
-    position:absolute;
-    left:-27px;top:5px;
-    width:9px;height:9px;
-    border-radius:50%;
-    background:var(--paper);
-    border:2px solid var(--verified);
-  }
-  .tl-date{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.76rem;
-    color:var(--amber);
-    background:var(--amber-bg);
-    display:inline-block;
-    padding:2px 7px;
-    border-radius:3px;
-    margin-bottom:6px;
-  }
-  .tl-item h4{
-    font-family:'Source Serif 4',serif;
-    font-size:1.03rem;
-    font-weight:600;
-    margin:0 0 3px;
-  }
-  .tl-item p{margin:0;font-size:0.9rem;color:var(--ink-soft);}
+  /* Formations */
+  .edu{display:grid;gap:0;border-top:1px solid var(--line);}
+  .tl-item{display:grid;grid-template-columns:140px 1fr auto;gap:8px 24px;align-items:baseline;padding:18px 0;border-bottom:1px solid var(--line);}
+  .tl-date{color:var(--muted);font-variant-numeric:tabular-nums;}
+  .tl-item h3{font-family:var(--body);font-size:1.02rem;font-weight:600;line-height:1.4;}
+  .tl-item p{margin:2px 0 0;color:var(--muted);font-size:.94rem;}
 
-  /* ---------- languages ---------- */
-  .lang-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:12px 0;
-    border-bottom:1px dotted var(--line);
-    max-width:420px;
-  }
-  .lang-row:last-child{border-bottom:none;}
-  .lang-name{font-size:0.98rem;}
-  .lang-level{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.76rem;
-    color:var(--verified);
-    background:var(--verified-bg);
-    border:1px solid var(--verified);
-    padding:3px 9px;
-    border-radius:3px;
-  }
+  /* Langues */
+  .langs{display:flex;flex-wrap:wrap;gap:16px;}
+  .lang{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 22px;min-width:220px;}
+  .lang strong{font-family:var(--display);font-size:1.2rem;display:block;}
+  .lang span{color:var(--muted);}
 
-  /* ---------- footer / contact ---------- */
-  footer{padding:56px 0 64px;}
-  .contact-box{
-    background:var(--ink);
-    color:var(--paper);
-    border-radius:8px;
-    padding:40px 36px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:24px;
-  }
-  .contact-box h2{
-    font-family:'Source Serif 4',serif;
-    font-weight:500;
-    font-size:1.6rem;
-    margin:0 0 8px;
-    max-width:22ch;
-    line-height:1.25;
-  }
-  .contact-box p{margin:0;color:#C7C4B8;font-size:0.92rem;}
-  .contact-links{display:flex;flex-direction:column;gap:10px;align-items:flex-end;}
-  .contact-links a{
-    color:var(--paper);
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.88rem;
-    text-decoration:none;
-    border-bottom:1px solid rgba(242,239,232,0.35);
-    padding-bottom:2px;
-  }
-  .contact-links a:hover{border-color:var(--paper);}
-  @media (max-width:640px){
-    .contact-box{flex-direction:column;align-items:flex-start;}
-    .contact-links{align-items:flex-start;}
-  }
-  .fine-print{
-    text-align:center;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:0.74rem;
-    color:var(--ink-soft);
-    margin-top:28px;
-  }
+  /* Contact */
+  footer{margin-top:96px;background:var(--ink);color:#DCE4EF;}
+  footer .wrap{padding-top:72px;padding-bottom:40px;}
+  footer h2{color:var(--surface);font-size:clamp(2rem,4.6vw,3.4rem);font-weight:800;letter-spacing:-.03em;line-height:1.02;max-width:14em;}
+  footer .lead{margin:16px 0 34px;font-size:1.1rem;color:#B5C2D4;max-width:34em;}
+  .contact-links{display:flex;flex-wrap:wrap;gap:12px;}
+  .contact-links a{text-decoration:none;padding:13px 22px;border-radius:999px;border:1.5px solid #4A5D79;color:var(--surface);font-weight:600;}
+  .contact-links a:first-child{background:var(--surface);color:var(--ink);border-color:var(--surface);}
+  .contact-links a:hover{border-color:var(--surface);}
+  .contact-links a:focus-visible{outline-color:#7FD3A7;}
+  .fine-print{margin:56px 0 0;padding-top:22px;border-top:1px solid #2B3F5C;font-size:.88rem;color:#8EA0BA;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;}
 
-  a:focus-visible, .ticket:focus-visible{
-    outline:2px solid var(--verified);
-    outline-offset:2px;
+  /* ---------- Adaptation ---------- */
+  @media (max-width:960px){
+    .hero .wrap{grid-template-columns:1fr;gap:40px;}
+    .proofs .wrap{grid-template-columns:1fr 1fr;}
+    .projects{grid-template-columns:1fr 1fr;}
+    .proof:nth-child(3){padding-left:0;border-left:0;}
+    .proof:nth-child(n+3){border-top:1px solid var(--line);}
+  }
+  @media (max-width:720px){
+    body{font-size:16px;}
+    .wrap{padding:0 20px;}
+    .topbar nav a:not(.nav-cta){display:none;}
+    .hero{padding:44px 0 40px;}
+    .projects,.skills{grid-template-columns:1fr;}
+    .project.featured .proj-fields{display:block;}
+    .project.featured .proj-fields dt{margin-top:10px;}
+    .project.featured .proj-fields dd{margin-top:2px;}
+    .tl-item{grid-template-columns:1fr;gap:4px;}
+    .run-count .n{font-size:1.9rem;}
+    .run-count{padding:12px;}
+    section.block{padding-top:64px;}
+    .current-panel{padding:20px;}
+  }
+  @media (max-width:420px){
+    .proofs .wrap{grid-template-columns:1fr;}
+    .proof,.proof + .proof{padding:16px 0;border-left:0;}
+    .proof + .proof{border-top:1px solid var(--line);}
   }
 </style>
 </head>
 <body>
 
-<div class="wrap">
-  <header class="masthead">
-    <div class="masthead-row">
-      <div class="masthead-title">
-        <img class="id-photo" src="assets/naim-ziani.png" alt="Photo de Naim Ziani">
-        <div>
-          <h1>Naim Ziani</h1>
-          <div class="role">QA Tester · Tests fonctionnels, API et automatisation</div>
+<div class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top">Naim Ziani</a>
+    <nav aria-label="Navigation principale">
+      <a href="#experience">Expérience</a>
+      <a href="#projets">Projets</a>
+      <a href="#competences">Compétences</a>
+      <a class="nav-cta" href="#contact">Me contacter</a>
+    </nav>
+  </div>
+</div>
+
+<main id="top">
+  <header class="hero">
+    <div class="wrap">
+      <div>
+        <div class="hero-id">
+          <img class="id-photo" src="assets/naim-ziani.png" alt="Photo de Naim Ziani" width="76" height="76">
+          <span class="availability">Disponible, poste ou mission</span>
+        </div>
+        <h1>Naim Ziani</h1>
+        <p class="role"><strong>QA Tester</strong>Tests fonctionnels, API et automatisation</p>
+        <p class="pitch">Testeur logiciel en entreprise depuis 2023, je rédige et j'exécute des campagnes de tests dans Jira et Xray, et j'automatise des parcours utilisateurs avec Playwright.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="#projets">Voir mes projets</a>
+          <a class="btn btn-ghost" href="#contact">Me contacter</a>
         </div>
       </div>
-      <span class="status-tag">● DISPONIBLE</span>
-    </div>
 
-    <dl class="meta-table">
-      <div>
-        <dt>Localisation</dt>
-        <dd>Île-de-France</dd>
-      </div>
-      <div>
-        <dt>Email</dt>
-        <dd><a href="mailto:naim.ziani26@gmail.com">naim.ziani26@gmail.com</a></dd>
-      </div>
-      <div>
-        <dt>Téléphone</dt>
-        <dd><a href="tel:+33612082842">06 12 08 28 42</a></dd>
-      </div>
-      <div>
-        <dt>LinkedIn</dt>
-        <dd><a href="https://linkedin.com/in/naim-ziani-7a70235" target="_blank" rel="noopener">naim-ziani-7a70235</a></dd>
-      </div>
-      <div>
-        <dt>Expérience</dt>
-        <dd>QA depuis 2023 · 10+ ans IT &amp; télécom</dd>
-      </div>
-      <div>
-        <dt>Domaine</dt>
-        <dd>Tests fonctionnels, non-régression, Jira/Xray</dd>
-      </div>
-    </dl>
-
-    <div class="terminal" id="test-results" role="region" aria-label="Résultats de la dernière exécution des tests automatisés">
-      <div class="terminal-bar">
-        <span class="terminal-dot"></span><span class="terminal-dot"></span><span class="terminal-dot"></span>
-        <span class="fname">playwright — dernière exécution des tests du portfolio</span>
-      </div>
-      <div class="terminal-body" id="termBody" aria-live="polite">
-        <div class="terminal-line"><span class="prompt">$</span> npx playwright test --project=portfolio-*</div>
-        <div id="termResults">
-          <div class="terminal-line muted" data-state="loading">Chargement des derniers résultats…</div>
+      <div class="run" id="test-results" role="region" aria-labelledby="run-title">
+        <div class="run-head">
+          <div>
+            <h2 id="run-title">Tests de ce portfolio</h2>
+            <p>Dernière exécution automatique, Chromium, Firefox et mobile</p>
+          </div>
+          <span class="run-status" id="run-status">En attente</span>
         </div>
-        <noscript><div class="terminal-line muted" style="opacity:1">Résultats non disponibles (JavaScript désactivé).</div></noscript>
+        <div id="termResults" aria-live="polite">
+          <div class="run-empty" data-state="loading">Chargement des derniers résultats…</div>
+        </div>
+        <noscript><div class="run-empty">Résultats non disponibles : JavaScript est désactivé.</div></noscript>
       </div>
-    </div>
-
-    <div class="stats-strip">
-      <div class="stat"><div class="num">2023</div><div class="label">testeur logiciel en entreprise depuis septembre (Rhôn'Telecom)</div></div>
-      <div class="stat"><div class="num">2</div><div class="label">certifications obtenues : ISTQB Fondation, PSPO I</div></div>
-      <div class="stat"><div class="num">10+</div><div class="label">ans d'expérience IT &amp; télécom</div></div>
-      <div class="stat"><div class="num" id="stat-tests">—</div><div class="label">tests automatisés lors de la dernière exécution CI</div></div>
     </div>
   </header>
 
-  <section id="profil">
-    <div class="section-head">
-      <span class="section-num">00</span>
-      <h2>Profil</h2>
+  <div class="proofs" aria-label="Repères">
+    <div class="wrap">
+      <div class="proof"><div class="num">Depuis 2023</div><div class="label">testeur logiciel chez Rhôn'Telecom</div></div>
+      <div class="proof"><div class="num">ISTQB, PSPO I</div><div class="label">certifications obtenues en 2023</div></div>
+      <div class="proof"><div class="num">10 ans et plus</div><div class="label">d'expérience IT et télécom</div></div>
+      <div class="proof"><div class="num" id="stat-tests">—</div><div class="label">tests automatisés à la dernière exécution</div></div>
     </div>
-    <p class="profile-text">
-      Je contribue à améliorer la qualité des applications grâce aux tests fonctionnels, aux tests de régression et à l'automatisation des parcours utilisateurs avec Playwright.
-      Testeur logiciel manuel depuis septembre 2023 chez Rhôn'Telecom, j'interviens sur les outils de production SFR (workflows et portail Fibre) : analyse des fonctionnalités, rédaction des cas de tests dans Xray, exécution des campagnes, non-régression, déclaration et suivi des anomalies dans Jira.
-      Certifié ISTQB Fondation et PSPO I, je développe en parallèle mes compétences en automatisation et en tests API ; la sécurité applicative est un complément, en cours de formation.
+  </div>
+
+  <section class="block" id="profil">
+    <div class="wrap">
+      <div class="block-head"><h2>Profil</h2></div>
+      <div class="block-body">
+        <p class="profile-text">Je contribue à améliorer la qualité des applications grâce aux tests fonctionnels, aux tests de régression et à l'automatisation des parcours utilisateurs avec Playwright.</p>
+        <p class="profile-text">Chez Rhôn'Telecom, j'interviens sur les outils de production SFR, les workflows et le portail Fibre : j'analyse les fonctionnalités, j'écris les cas de tests dans Xray, j'exécute les campagnes et la non-régression, puis je déclare et suis les anomalies dans Jira jusqu'à leur correction.</p>
+        <p class="profile-text">Certifié ISTQB Fondation et PSPO I, je développe en parallèle mes compétences en automatisation et en tests API. La sécurité applicative est un complément, en cours de formation.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="experience">
+    <div class="wrap">
+      <div class="block-head"><h2>Expérience professionnelle</h2><p>Dix ans dans les télécoms, du terrain à la qualité logicielle.</p></div>
+      <div class="block-body timeline">
+        <div class="ticket job current">
+          <div class="current-panel">
+            <div class="job-head">
+              <h3>Testeur logiciel manuel</h3>
+              <span class="pill pass">En poste</span>
+            </div>
+            <div class="job-dates">Septembre 2023 – aujourd'hui</div>
+            <div class="job-org">Rhôn'Telecom, outils de production SFR (workflows, portail Fibre), Île-de-France</div>
+            <ul>
+              <li>Analyse des fonctionnalités et identification des scénarios de tests à couvrir</li>
+              <li>Rédaction autonome de cas de tests fonctionnels dans Xray</li>
+              <li>Exécution des campagnes de tests manuels</li>
+              <li>Tests de non-régression après les évolutions applicatives</li>
+              <li>Identification, qualification et déclaration des anomalies dans Jira</li>
+              <li>Suivi des anomalies jusqu'à leur résolution et vérification des corrections</li>
+              <li>Contrôle du bon fonctionnement des workflows et des parcours utilisateurs du portail Fibre</li>
+              <li>Vérification de la conformité des fonctionnalités par rapport aux résultats attendus</li>
+            </ul>
+            <p class="job-env">Environnement : Jira, Xray, tests fonctionnels, manuels et de non-régression, gestion des anomalies.</p>
+          </div>
+        </div>
+        <div class="ticket job past">
+          <div class="job-head"><h3>Chargé de déploiement télécom</h3><span class="job-dates">2019 – 2023</span></div>
+          <div class="job-org">Altice France, Rhôn'Telecom, Île-de-France</div>
+          <ul>
+            <li>Gestion de projets de déploiement d'infrastructures télécom</li>
+            <li>Suivi de la mise en œuvre des services et validation des installations</li>
+          </ul>
+        </div>
+        <div class="ticket job past">
+          <div class="job-head"><h3>Technicien installateur fibre optique</h3><span class="job-dates">2015 – 2019</span></div>
+          <div class="job-org">Fibre Avenir, Île-de-France</div>
+          <ul>
+            <li>Installation et mise en service de réseaux de fibre optique</li>
+            <li>Tests de connexion et validation des installations avant livraison client</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="projets">
+    <div class="wrap">
+      <div class="block-head"><h2>Projets</h2><p>Projets personnels, distincts de mon expérience en entreprise. Les résultats sont ceux réellement obtenus ; ce qui reste à faire est indiqué.</p></div>
+      <div class="projects">
+        <article class="ticket project featured" id="proj-playwright">
+          <span><span class="pill pass">Réalisé, projet personnel</span></span>
+          <h3>Automatisation de tests avec Playwright</h3>
+          <dl class="proj-fields">
+            <dt>Objectif</dt><dd>Automatiser des parcours utilisateurs, les exécuter à chaque modification et publier un rapport consultable.</dd>
+            <dt>Contexte</dt><dd>Deux suites : ce portfolio, cible maîtrisée exécutée en intégration continue, et des parcours publics de leboncoin.fr, site tiers lancé à la demande, sans compte ni contournement des protections.</dd>
+            <dt>Outils</dt><dd>Playwright (JavaScript), GitHub Actions, rapport HTML Playwright ; Chromium, Firefox et mobile émulé.</dd>
+            <dt>Scénarios</dt><dd>Portfolio : sections, liens, contact, affichage des résultats y compris les cas d'erreur, responsive. Leboncoin : accueil, catégories, recherche avec et sans résultat.</dd>
+            <dt>Résultats</dt><dd>Portfolio : voir le rapport d'exécution en haut de page. Leboncoin : pas encore exécutée en intégration continue (site protégé contre l'automatisation, limites documentées).</dd>
+          </dl>
+          <div class="proj-links">
+            <a class="proj-link" href="https://github.com/Naimz26/qa-portfolio/tree/main/playwright-automation" target="_blank" rel="noopener">Voir le code</a>
+            <a class="proj-link" href="https://github.com/Naimz26/qa-portfolio/blob/main/playwright-automation/README.md" target="_blank" rel="noopener">Documentation</a>
+            <a class="proj-link" href="https://github.com/Naimz26/qa-portfolio/actions" target="_blank" rel="noopener">Exécutions sur GitHub</a>
+          </div>
+        </article>
+
+        <article class="ticket project" id="proj-manuel">
+          <span><span class="pill pass">Préparé, projet personnel</span></span>
+          <h3>Tests fonctionnels et rapports d'anomalies sur leboncoin.fr</h3>
+          <dl class="proj-fields">
+            <dt>Objectif</dt><dd>Montrer une démarche QA complète : plan de test, cas de test, rapports d'anomalies, rapport de campagne.</dd>
+            <dt>Contexte</dt><dd>Exercice sur un site public, sans lien avec l'éditeur. Les exemples pédagogiques sont signalés comme tels.</dd>
+            <dt>Outils</dt><dd>Modèles de documents QA en Markdown, navigateur, outils de développement.</dd>
+            <dt>Scénarios</dt><dd>Accueil, recherche, catégories, consentement cookies, accès au dépôt d'annonce.</dd>
+            <dt>Résultats</dt><dd>Statut de chaque cas dans le rapport de campagne, « non exécuté » tant qu'il n'a pas été joué.</dd>
+          </dl>
+          <div class="proj-links">
+            <a class="proj-link" href="https://github.com/Naimz26/qa-portfolio/tree/main/manual-testing" target="_blank" rel="noopener">Voir les documents</a>
+          </div>
+        </article>
+
+        <article class="ticket project planned" id="proj-api">
+          <span><span class="pill learn">À réaliser</span></span>
+          <h3>Tests API avec Postman</h3>
+          <dl class="proj-fields">
+            <dt>Objectif</dt><dd>Tester une API REST publique de démonstration : codes de réponse, contenu, cas d'erreur, enchaînement de requêtes.</dd>
+            <dt>Contexte</dt><dd>Projet préparé, pas encore réalisé : la structure et les scénarios prévus sont documentés.</dd>
+            <dt>Outils</dt><dd>Postman, Newman en ligne de commande, GitHub Actions.</dd>
+            <dt>Résultats</dt><dd>Aucun pour l'instant.</dd>
+          </dl>
+          <div class="proj-links">
+            <a class="proj-link" href="https://github.com/Naimz26/qa-portfolio/blob/main/api-testing/README.md" target="_blank" rel="noopener">Voir le plan du projet</a>
+          </div>
+        </article>
+
+        <article class="ticket project planned" id="proj-securite">
+          <span><span class="pill known">En cours de formation</span></span>
+          <h3>Sécurité applicative, en complément</h3>
+          <dl class="proj-fields">
+            <dt>Objectif</dt><dd>Intégrer des vérifications de sécurité de base dans une démarche de test : OWASP Top 10, en-têtes HTTP, gestion des entrées.</dd>
+            <dt>Contexte</dt><dd>Formation Cybersécurité Full Stack JEDHA, diplôme en cours d'obtention. Aucun livrable publié pour l'instant.</dd>
+            <dt>Outils vus en formation</dt><dd>Burp Suite, Wireshark, Nessus, SIEM (Wazuh, Splunk), Snort.</dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="competences">
+    <div class="wrap">
+      <div class="block-head"><h2>Compétences clés</h2><p>Classées selon ce que je peux prouver.</p></div>
+      <div class="skill-legend">
+        <span class="pill pass">Pratiqué, avec des résultats vérifiables</span>
+        <span class="pill known">Connaissances acquises en formation ou certification</span>
+        <span class="pill learn">En cours d'apprentissage</span>
+      </div>
+      <div class="skills">
+        <div>
+          <h3 class="skill-cat">Pratiquées en entreprise, chez Rhôn'Telecom depuis 2023</h3>
+          <div class="skill-grid">
+            <div class="skill-item"><span class="mark" aria-hidden="true">✓</span>Analyse des fonctionnalités et des scénarios à couvrir</div>
+            <div class="skill-item"><span class="mark" aria-hidden="true">✓</span>Rédaction de cas de tests fonctionnels (Xray)</div>
+            <div class="skill-item"><span class="mark" aria-hidden="true">✓</span>Exécution de campagnes de tests manuels</div>
+            <div class="skill-item"><span class="mark" aria-hidden="true">✓</span>Tests de non-régression</div>
+            <div class="skill-item"><span class="mark" aria-hidden="true">✓</span>Qualification et déclaration des anomalies (Jira)</div>
+            <div class="skill-item"><span class="mark" aria-hidden="true">✓</span>Suivi des anomalies et vérification des corrections</div>
+          </div>
+        </div>
+        <div>
+          <h3 class="skill-cat">Pratiquées dans des projets personnels</h3>
+          <div class="skill-grid">
+            <div class="skill-item"><span class="mark" aria-hidden="true">✓</span>Automatisation de parcours avec Playwright (JavaScript)</div>
+            <div class="skill-item"><span class="mark" aria-hidden="true">✓</span>Intégration continue avec GitHub Actions</div>
+            <div class="skill-item"><span class="mark" aria-hidden="true">✓</span>Git et GitHub</div>
+          </div>
+          <h3 class="skill-cat" style="margin-top:28px;">Connaissances</h3>
+          <div class="skill-grid">
+            <div class="skill-item known"><span class="mark" aria-hidden="true">○</span>Techniques de conception de tests (ISTQB)</div>
+            <div class="skill-item known"><span class="mark" aria-hidden="true">○</span>Agile et Scrum (PSPO I)</div>
+            <div class="skill-item known"><span class="mark" aria-hidden="true">○</span>Tests exploratoires</div>
+            <div class="skill-item known"><span class="mark" aria-hidden="true">○</span>Gherkin</div>
+          </div>
+          <h3 class="skill-cat" style="margin-top:28px;">En cours d'apprentissage</h3>
+          <div class="skill-grid">
+            <div class="skill-item learning"><span class="mark" aria-hidden="true">…</span>Tests API (Postman)</div>
+            <div class="skill-item learning"><span class="mark" aria-hidden="true">…</span>Selenium, Cypress</div>
+            <div class="skill-item learning"><span class="mark" aria-hidden="true">…</span>Python, SQL</div>
+            <div class="skill-item learning"><span class="mark" aria-hidden="true">…</span>Sécurité applicative (formation JEDHA)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="outils">
+    <div class="wrap">
+      <div class="block-head"><h2>Outils &amp; technologies</h2></div>
+      <div class="block-body tools">
+        <div class="tool-group lvl-pass">
+          <h3><span class="pill pass">Utilisés en entreprise</span></h3>
+          <div class="tool-tags"><span class="tool-tag">Jira</span><span class="tool-tag">Xray</span></div>
+        </div>
+        <div class="tool-group lvl-pass">
+          <h3><span class="pill pass">Utilisés dans mes projets</span></h3>
+          <div class="tool-tags">
+            <span class="tool-tag">Playwright</span><span class="tool-tag">JavaScript (Node.js)</span><span class="tool-tag">GitHub Actions</span>
+            <span class="tool-tag">Git</span><span class="tool-tag">GitHub</span><span class="tool-tag">VS Code</span>
+          </div>
+        </div>
+        <div class="tool-group lvl-learn">
+          <h3><span class="pill learn">Notions, en cours d'apprentissage</span></h3>
+          <div class="tool-tags">
+            <span class="tool-tag">Postman</span><span class="tool-tag">Selenium</span><span class="tool-tag">Cypress</span>
+            <span class="tool-tag">Python</span><span class="tool-tag">SQL</span><span class="tool-tag">Shell (Bash, Zsh)</span><span class="tool-tag">Gherkin</span>
+            <span class="tool-tag">Docker</span><span class="tool-tag">Azure</span><span class="tool-tag">AWS</span><span class="tool-tag">Power BI Desktop</span>
+          </div>
+        </div>
+        <div class="tool-group lvl-learn">
+          <h3><span class="pill known">Sécurité, vus en formation (complément)</span></h3>
+          <div class="tool-tags">
+            <span class="tool-tag">Wireshark</span><span class="tool-tag">Burp Suite</span><span class="tool-tag">Nessus</span>
+            <span class="tool-tag">SIEM (Wazuh, Splunk)</span><span class="tool-tag">Snort</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="formations">
+    <div class="wrap">
+      <div class="block-head"><h2>Formations &amp; certifications</h2></div>
+      <div class="block-body edu">
+        <div class="tl-item">
+          <span class="tl-date">2024 – en cours</span>
+          <div><h3>Formation Cybersécurité Full Stack – Administrateur d'infrastructures sécurisées</h3><p>JEDHA, diplôme en cours d'obtention</p></div>
+          <span class="pill known">En cours</span>
+        </div>
+        <div class="tl-item">
+          <span class="tl-date">2023</span>
+          <div><h3>Certification ISTQB – Testeur Logiciel Niveau Fondation</h3><p>3I-SCHOOL, certification obtenue</p></div>
+          <span class="pill pass">Obtenue</span>
+        </div>
+        <div class="tl-item">
+          <span class="tl-date">2023</span>
+          <div><h3>Certification PSPO I – Professional Scrum Product Owner</h3><p>3I-SCHOOL, certification obtenue</p></div>
+          <span class="pill pass">Obtenue</span>
+        </div>
+        <div class="tl-item">
+          <span class="tl-date">2013</span>
+          <div><h3>Licence Management des organisations</h3><p>Université Paris-Est-Marne-la-Vallée</p></div>
+          <span></span>
+        </div>
+        <div class="tl-item">
+          <span class="tl-date">2012</span>
+          <div><h3>DUT Techniques de commercialisation</h3><p>Université Paris-Est-Marne-la-Vallée</p></div>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="langues">
+    <div class="wrap">
+      <div class="block-head"><h2>Langues</h2></div>
+      <div class="block-body langs">
+        <div class="lang"><strong>Français</strong><span>Courant (C2)</span></div>
+        <div class="lang"><strong>Anglais</strong><span>Intermédiaire (B1)</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <h2>Un projet de test à confier, ou un poste QA à pourvoir ?</h2>
+    <p class="lead">Je suis disponible pour un poste ou une mission en Île-de-France. Écrivez-moi, je réponds rapidement.</p>
+    <div class="contact-links">
+      <a href="mailto:naim.ziani26@gmail.com">naim.ziani26@gmail.com</a>
+      <a href="tel:+33612082842">06 12 08 28 42</a>
+      <a href="https://linkedin.com/in/naim-ziani-7a70235" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <p class="fine-print">
+      <span>Naim Ziani, QA Tester. Portfolio mis à jour en novembre 2026.</span>
+      <a href="https://github.com/Naimz26/qa-portfolio" target="_blank" rel="noopener">Code source et tests sur GitHub</a>
     </p>
-  </section>
-
-  <section id="competences">
-    <div class="section-head">
-      <span class="section-num">01</span>
-      <h2>Compétences clés</h2>
-    </div>
-    <h3 class="skill-cat">Pratiquées en entreprise — Rhôn'Telecom, depuis 2023</h3>
-    <div class="skill-grid">
-      <div class="skill-item"><span class="mark">✓</span>Analyse des fonctionnalités et des scénarios à couvrir</div>
-      <div class="skill-item"><span class="mark">✓</span>Rédaction de cas de tests fonctionnels (Xray)</div>
-      <div class="skill-item"><span class="mark">✓</span>Exécution de campagnes de tests manuels</div>
-      <div class="skill-item"><span class="mark">✓</span>Tests de non-régression</div>
-      <div class="skill-item"><span class="mark">✓</span>Qualification et déclaration des anomalies (Jira)</div>
-      <div class="skill-item"><span class="mark">✓</span>Suivi des anomalies et vérification des corrections</div>
-    </div>
-    <h3 class="skill-cat">Pratiquées dans des projets personnels</h3>
-    <div class="skill-grid">
-      <div class="skill-item"><span class="mark">✓</span>Automatisation de parcours avec Playwright (JavaScript)</div>
-      <div class="skill-item"><span class="mark">✓</span>Intégration continue avec GitHub Actions</div>
-      <div class="skill-item"><span class="mark">✓</span>Git et GitHub</div>
-    </div>
-    <h3 class="skill-cat">Connaissances</h3>
-    <div class="skill-grid">
-      <div class="skill-item known"><span class="mark">○</span>Techniques de conception de tests (ISTQB)</div>
-      <div class="skill-item known"><span class="mark">○</span>Agile / Scrum (PSPO I)</div>
-      <div class="skill-item known"><span class="mark">○</span>Tests exploratoires</div>
-      <div class="skill-item known"><span class="mark">○</span>Gherkin</div>
-    </div>
-    <h3 class="skill-cat">En cours d'apprentissage</h3>
-    <div class="skill-grid">
-      <div class="skill-item learning"><span class="mark">…</span>Tests API (Postman)</div>
-      <div class="skill-item learning"><span class="mark">…</span>Selenium, Cypress</div>
-      <div class="skill-item learning"><span class="mark">…</span>Python, SQL</div>
-      <div class="skill-item learning"><span class="mark">…</span>Sécurité applicative (formation JEDHA)</div>
-    </div>
-    <p class="skill-legend">✓ pratiqué avec des résultats vérifiables · ○ connaissances acquises en formation ou certification · … en cours d'apprentissage</p>
-  </section>
-
-  <section id="experience">
-    <div class="section-head">
-      <span class="section-num">02</span>
-      <h2>Expérience professionnelle</h2>
-    </div>
-
-    <div class="ticket">
-      <span class="ticket-id">EXP-03</span>
-      <div class="ticket-head">
-        <h3 class="ticket-title">Testeur logiciel manuel <span class="ticket-status status-active">EN COURS</span></h3>
-        <span class="ticket-dates">Septembre 2023 – Aujourd'hui</span>
-      </div>
-      <div class="ticket-org">Rhôn'Telecom · outils de production SFR (workflows, portail Fibre) · Île-de-France</div>
-      <ul>
-        <li>Analyse des fonctionnalités et identification des scénarios de tests à couvrir</li>
-        <li>Rédaction autonome de cas de tests fonctionnels dans Xray</li>
-        <li>Exécution des campagnes de tests manuels</li>
-        <li>Tests de non-régression après les évolutions applicatives</li>
-        <li>Identification, qualification et déclaration des anomalies dans Jira</li>
-        <li>Suivi des anomalies jusqu'à leur résolution et vérification des corrections</li>
-        <li>Contrôle du bon fonctionnement des workflows et des parcours utilisateurs du portail Fibre</li>
-        <li>Vérification de la conformité des fonctionnalités par rapport aux résultats attendus</li>
-      </ul>
-      <p style="margin:12px 0 0;font-size:0.85rem;color:var(--ink-soft);">Environnement : Jira, Xray · tests fonctionnels, manuels et de non-régression · gestion des anomalies</p>
-    </div>
-
-    <div class="ticket">
-      <span class="ticket-id">EXP-02</span>
-      <div class="ticket-head">
-        <h3 class="ticket-title">Chargé de Déploiement Telecom <span class="ticket-status status-done">TERMINÉ</span></h3>
-        <span class="ticket-dates">2019 – 2023</span>
-      </div>
-      <div class="ticket-org">Altice France · Rhôn'Telecom · Île-de-France</div>
-      <ul>
-        <li>Gestion de projets de déploiement d'infrastructures télécom</li>
-        <li>Suivi de la mise en œuvre des services et validation des installations</li>
-      </ul>
-    </div>
-
-    <div class="ticket">
-      <span class="ticket-id">EXP-01</span>
-      <div class="ticket-head">
-        <h3 class="ticket-title">Technicien Installateur Fibre Optique <span class="ticket-status status-done">TERMINÉ</span></h3>
-        <span class="ticket-dates">2015 – 2019</span>
-      </div>
-      <div class="ticket-org">Fibre Avenir · Île-de-France</div>
-      <ul>
-        <li>Installation et mise en service de réseaux de fibre optique</li>
-        <li>Tests de connexion et validation des installations avant livraison client</li>
-      </ul>
-    </div>
-  </section>
-
-  <section id="projets">
-    <div class="section-head">
-      <span class="section-num">03</span>
-      <h2>Projets</h2>
-    </div>
-    <p style="margin:0 0 18px;font-size:0.92rem;color:var(--ink-soft);">Projets personnels, distincts de mon expérience en entreprise. Les résultats indiqués sont ceux réellement obtenus ; ce qui reste à faire est signalé comme tel.</p>
-
-    <div class="ticket" id="proj-playwright">
-      <span class="ticket-id">PROJ-01</span>
-      <div class="ticket-head">
-        <h3 class="ticket-title">Automatisation de tests avec Playwright <span class="proj-badge">PROJET PERSONNEL</span></h3>
-      </div>
-      <dl class="proj-fields">
-        <dt>Objectif</dt><dd>Automatiser des parcours utilisateurs et les exécuter automatiquement à chaque modification, avec un rapport consultable.</dd>
-        <dt>Contexte</dt><dd>Deux suites : ce portfolio (cible maîtrisée, exécutée en intégration continue) et des parcours publics de leboncoin.fr (site tiers, exécution à la demande, sans compte ni contournement des protections).</dd>
-        <dt>Outils</dt><dd>Playwright (JavaScript), GitHub Actions, rapport HTML Playwright · Chromium, Firefox, mobile émulé</dd>
-        <dt>Scénarios</dt><dd>Portfolio : sections, liens, contact, affichage des résultats (y compris cas d'erreur), responsive. Leboncoin : accueil, catégories, recherche avec et sans résultat.</dd>
-        <dt>Résultats</dt><dd>Portfolio : voir l'encadré « dernière exécution » en haut de page. Leboncoin : non exécutée en intégration continue à ce jour (site protégé contre l'automatisation, limites documentées).</dd>
-      </dl>
-      <div class="proj-links">
-        <a class="proj-link" href="https://github.com/Naimz26/qa-portfolio/tree/main/playwright-automation" target="_blank" rel="noopener">Code ↗</a>
-        <a class="proj-link" href="https://github.com/Naimz26/qa-portfolio/blob/main/playwright-automation/README.md" target="_blank" rel="noopener">Documentation ↗</a>
-        <a class="proj-link" href="https://github.com/Naimz26/qa-portfolio/actions" target="_blank" rel="noopener">Exécutions CI ↗</a>
-      </div>
-    </div>
-
-    <div class="ticket" id="proj-api">
-      <span class="ticket-id">PROJ-02</span>
-      <div class="ticket-head">
-        <h3 class="ticket-title">Tests API avec Postman <span class="proj-badge todo">À RÉALISER</span></h3>
-      </div>
-      <dl class="proj-fields">
-        <dt>Objectif</dt><dd>Tester une API REST publique de démonstration : codes de réponse, contenu, cas d'erreur, enchaînement de requêtes.</dd>
-        <dt>Contexte</dt><dd>Projet préparé, pas encore réalisé : la structure et les scénarios prévus sont documentés.</dd>
-        <dt>Outils</dt><dd>Postman, Newman (exécution en ligne de commande), GitHub Actions</dd>
-        <dt>Résultats</dt><dd>Aucun pour l'instant.</dd>
-      </dl>
-      <div class="proj-links">
-        <a class="proj-link" href="https://github.com/Naimz26/qa-portfolio/blob/main/api-testing/README.md" target="_blank" rel="noopener">Plan du projet ↗</a>
-      </div>
-    </div>
-
-    <div class="ticket" id="proj-manuel">
-      <span class="ticket-id">PROJ-03</span>
-      <div class="ticket-head">
-        <h3 class="ticket-title">Tests fonctionnels et rapports d'anomalies — leboncoin.fr <span class="proj-badge">PROJET PERSONNEL</span></h3>
-      </div>
-      <dl class="proj-fields">
-        <dt>Objectif</dt><dd>Montrer une démarche QA complète : plan de test, cas de test, rapports d'anomalies, rapport de campagne.</dd>
-        <dt>Contexte</dt><dd>Exercice sur un site public, sans lien avec l'éditeur. Parcours publics et non intrusifs ; les exemples pédagogiques sont signalés comme tels.</dd>
-        <dt>Outils</dt><dd>Modèles de documents QA (Markdown), navigateur, outils de développement</dd>
-        <dt>Scénarios</dt><dd>Accueil, recherche, catégories, consentement cookies, accès au dépôt d'annonce</dd>
-        <dt>Résultats</dt><dd>Les statuts de chaque cas sont indiqués dans le rapport de campagne (« non exécuté » tant qu'un cas n'a pas été joué).</dd>
-      </dl>
-      <div class="proj-links">
-        <a class="proj-link" href="https://github.com/Naimz26/qa-portfolio/tree/main/manual-testing" target="_blank" rel="noopener">Documents ↗</a>
-      </div>
-    </div>
-
-    <div class="ticket" id="proj-securite">
-      <span class="ticket-id">PROJ-04</span>
-      <div class="ticket-head">
-        <h3 class="ticket-title">Sécurité applicative — complément <span class="proj-badge todo">EN COURS DE FORMATION</span></h3>
-      </div>
-      <dl class="proj-fields">
-        <dt>Objectif</dt><dd>Intégrer des vérifications de sécurité de base dans une démarche de test (OWASP Top 10, en-têtes HTTP, gestion des entrées).</dd>
-        <dt>Contexte</dt><dd>Formation Cybersécurité Full Stack JEDHA, diplôme en cours d'obtention. Aucun livrable publié pour l'instant.</dd>
-        <dt>Outils vus en formation</dt><dd>Burp Suite, Wireshark, Nessus, SIEM (Wazuh, Splunk), Snort</dd>
-      </dl>
-    </div>
-  </section>
-
-  <section id="outils">
-    <div class="section-head">
-      <span class="section-num">04</span>
-      <h2>Outils &amp; technologies</h2>
-    </div>
-
-    <div class="tool-group">
-      <h3>Utilisés en entreprise</h3>
-      <div class="tool-tags">
-        <span class="tool-tag">Jira</span><span class="tool-tag">Xray</span>
-      </div>
-    </div>
-    <div class="tool-group">
-      <h3>Utilisés dans mes projets</h3>
-      <div class="tool-tags">
-        <span class="tool-tag">Playwright</span><span class="tool-tag">JavaScript (Node.js)</span><span class="tool-tag">GitHub Actions</span>
-        <span class="tool-tag">Git</span><span class="tool-tag">GitHub</span><span class="tool-tag">VS Code</span>
-      </div>
-    </div>
-    <div class="tool-group">
-      <h3>Notions / en cours d'apprentissage</h3>
-      <div class="tool-tags">
-        <span class="tool-tag">Postman</span><span class="tool-tag">Selenium</span><span class="tool-tag">Cypress</span>
-        <span class="tool-tag">Python</span><span class="tool-tag">SQL</span><span class="tool-tag">Shell (Bash, Zsh)</span><span class="tool-tag">Gherkin</span>
-        <span class="tool-tag">Docker</span><span class="tool-tag">Azure</span><span class="tool-tag">AWS</span><span class="tool-tag">Power BI Desktop</span>
-      </div>
-    </div>
-    <div class="tool-group">
-      <h3>Sécurité — vus en formation (complément)</h3>
-      <div class="tool-tags">
-        <span class="tool-tag">Wireshark</span><span class="tool-tag">Burp Suite</span><span class="tool-tag">Nessus</span>
-        <span class="tool-tag">SIEM (Wazuh, Splunk)</span><span class="tool-tag">Snort</span>
-      </div>
-    </div>
-  </section>
-
-  <section id="formations">
-    <div class="section-head">
-      <span class="section-num">05</span>
-      <h2>Formations &amp; certifications</h2>
-    </div>
-    <div class="timeline">
-      <div class="tl-item">
-        <span class="tl-date">2024 – en cours</span>
-        <h4>Formation Cybersécurité Full Stack – Administrateur d'infrastructures sécurisées</h4>
-        <p>JEDHA · diplôme en cours d'obtention</p>
-      </div>
-      <div class="tl-item">
-        <span class="tl-date">2023</span>
-        <h4>Certification ISTQB – Testeur Logiciel Niveau Fondation</h4>
-        <p>3I-SCHOOL · certification obtenue</p>
-      </div>
-      <div class="tl-item">
-        <span class="tl-date">2023</span>
-        <h4>Certification PSPO I – Professional Scrum Product Owner</h4>
-        <p>3I-SCHOOL · certification obtenue</p>
-      </div>
-      <div class="tl-item">
-        <span class="tl-date">2013</span>
-        <h4>Licence Management des organisations</h4>
-        <p>Université Paris-Est-Marne-la-Vallée</p>
-      </div>
-      <div class="tl-item">
-        <span class="tl-date">2012</span>
-        <h4>DUT Technique de Commercialisation</h4>
-        <p>Université Paris-Est-Marne-la-Vallée</p>
-      </div>
-    </div>
-  </section>
-
-  <section id="langues">
-    <div class="section-head">
-      <span class="section-num">06</span>
-      <h2>Langues</h2>
-    </div>
-    <div class="lang-row">
-      <span class="lang-name">Français</span>
-      <span class="lang-level">C2 · COURANT</span>
-    </div>
-    <div class="lang-row">
-      <span class="lang-name">Anglais</span>
-      <span class="lang-level">B1 · INTERMÉDIAIRE</span>
-    </div>
-  </section>
-
-  <footer>
-    <div class="contact-box">
-      <div>
-        <h2>Discutons de votre prochain projet QA.</h2>
-        <p>Disponible pour un poste ou une mission.</p>
-      </div>
-      <div class="contact-links">
-        <a href="mailto:naim.ziani26@gmail.com">naim.ziani26@gmail.com</a>
-        <a href="tel:+33612082842">06 12 08 28 42</a>
-        <a href="https://linkedin.com/in/naim-ziani-7a70235" target="_blank" rel="noopener">LinkedIn ↗</a>
-      </div>
-    </div>
-    <p class="fine-print">Naim Ziani — QA Tester · Portfolio mis à jour en novembre 2026 · <a href="https://github.com/Naimz26/qa-portfolio" target="_blank" rel="noopener" style="color:inherit;">code source ↗</a></p>
-  </footer>
-</div>
+  </div>
+</footer>
 
 <script>
   /*
@@ -826,41 +548,41 @@
    */
   (function(){
     var box = document.getElementById('termResults');
+    var statusPill = document.getElementById('run-status');
     var statTests = document.getElementById('stat-tests');
     var ACTIONS_URL = 'https://github.com/Naimz26/qa-portfolio/actions';
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    function line(text, cls, attrs){
-      var d = document.createElement('div');
-      d.className = 'terminal-line' + (cls ? ' ' + cls : '');
-      d.textContent = text;
+    function el(tag, cls, text, attrs){
+      var d = document.createElement(tag);
+      if (cls) d.className = cls;
+      if (text !== undefined) d.textContent = text;
       if (attrs) Object.keys(attrs).forEach(function(k){ d.setAttribute(k, attrs[k]); });
       return d;
     }
     function link(href, text){
-      var a = document.createElement('a');
-      a.href = href; a.textContent = text;
+      var a = el('a', '', text, { href: href });
       if (/^https?:/.test(href)) { a.target = '_blank'; a.rel = 'noopener'; }
       return a;
     }
-    function pad(label){ return (label + ' ').padEnd(26, '.') + ' '; }
     function isCount(n){ return typeof n === 'number' && isFinite(n) && n >= 0 && Math.floor(n) === n; }
-    function reveal(){
-      var lines = document.querySelectorAll('#termBody .terminal-line');
-      lines.forEach(function(l, i){
-        if (reduce) { l.style.opacity = 1; return; }
-        setTimeout(function(){ l.style.transition = 'opacity .35s ease'; l.style.opacity = 1; }, 250 + i * 300);
-      });
+    function setStatus(text, status){
+      statusPill.textContent = text;
+      if (status) statusPill.setAttribute('data-status', status); else statusPill.removeAttribute('data-status');
     }
     function unavailable(reason){
       box.innerHTML = '';
-      box.appendChild(line('Résultats non disponibles : ' + reason, 'muted', { 'data-state': 'unavailable' }));
-      var links = document.createElement('div');
-      links.className = 'terminal-links';
-      links.appendChild(link(ACTIONS_URL, '→ historique des exécutions GitHub Actions'));
-      box.appendChild(links);
+      box.appendChild(el('div', 'run-empty', 'Résultats non disponibles : ' + reason, { 'data-state': 'unavailable' }));
+      var foot = el('div', 'run-foot');
+      foot.appendChild(link(ACTIONS_URL, 'Historique des exécutions sur GitHub'));
+      box.appendChild(foot);
+      setStatus('Non disponible');
       if (statTests) statTests.textContent = '—';
-      reveal();
+    }
+    function count(cls, n, label, field){
+      var c = el('div', 'run-count ' + cls);
+      c.appendChild(el('div', 'n', String(n), { 'data-field': field }));
+      c.appendChild(el('div', 'l', label));
+      return c;
     }
     function render(r){
       var t = r && r.totals;
@@ -873,25 +595,38 @@
       var date = r.startedAt ? new Date(r.startedAt) : null;
       var when = date && !isNaN(date) ? date.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Paris' }) : 'date inconnue';
       var origin = r.source === 'github-actions' ? 'GitHub Actions' : 'exécution locale';
+      var ok = t.failed === 0 && r.status === 'passed';
+      var total = executed + t.skipped;
 
       box.innerHTML = '';
-      box.appendChild(line(pad('dernière exécution') + when + (r.commit ? ' · commit ' + r.commit : '') + ' · ' + origin, 'muted', { 'data-field': 'date' }));
-      box.appendChild(line(pad('tests réussis') + t.passed, 'pass', { 'data-field': 'passed' }));
-      box.appendChild(line(pad('tests échoués') + t.failed, t.failed > 0 ? 'fail' : 'pass', { 'data-field': 'failed' }));
-      if (flaky > 0) box.appendChild(line(pad('réussis après relance') + flaky, 'fail', { 'data-field': 'flaky' }));
-      box.appendChild(line(pad('tests ignorés') + t.skipped, 'muted', { 'data-field': 'skipped' }));
-      var ok = t.failed === 0 && r.status === 'passed';
-      box.appendChild(line(
-        ok ? 'PIPELINE : SUCCÈS — ' + (t.passed + flaky) + '/' + executed + ' réussis'
-           : 'PIPELINE : ÉCHEC — ' + t.failed + ' échec(s) sur ' + executed + ' tests',
-        'summary' + (ok ? '' : ' is-failed'), { 'data-field': 'status', 'data-status': ok ? 'passed' : 'failed' }));
-      var links = document.createElement('div');
-      links.className = 'terminal-links';
-      links.appendChild(link('report/index.html', '→ rapport HTML Playwright'));
-      links.appendChild(link(r.runUrl || ACTIONS_URL, '→ détail de l’exécution GitHub Actions'));
-      box.appendChild(links);
-      if (statTests) statTests.textContent = String(executed + t.skipped);
-      reveal();
+      var counts = el('div', 'run-counts');
+      counts.appendChild(count('is-pass', t.passed + flaky, 'réussis', 'passed'));
+      counts.appendChild(count(t.failed > 0 ? 'is-fail' : 'is-zero', t.failed, 'échoués', 'failed'));
+      counts.appendChild(count('is-zero', t.skipped, 'ignorés', 'skipped'));
+      box.appendChild(counts);
+
+      var bar = el('div', 'run-bar', undefined, { 'aria-hidden': 'true' });
+      [['b-pass', t.passed + flaky], ['b-fail', t.failed], ['b-skip', t.skipped]].forEach(function(p){
+        if (p[1] > 0) { var s = el('span', p[0]); s.style.width = (100 * p[1] / total) + '%'; bar.appendChild(s); }
+      });
+      box.appendChild(bar);
+
+      var log = el('div', 'run-log');
+      log.appendChild(el('div', 'dim', when + (r.commit ? ', commit ' + r.commit : '') + ', ' + origin, { 'data-field': 'date' }));
+      if (flaky > 0) log.appendChild(el('div', 'ko', flaky + ' test(s) réussi(s) seulement après relance', { 'data-field': 'flaky' }));
+      log.appendChild(el('div', ok ? 'ok' : 'ko',
+        ok ? 'Pipeline réussi : ' + (t.passed + flaky) + '/' + executed + ' tests réussis'
+           : 'Pipeline en échec : ' + t.failed + ' échec(s) sur ' + executed + ' tests',
+        { 'data-field': 'status', 'data-status': ok ? 'passed' : 'failed' }));
+      box.appendChild(log);
+
+      var foot = el('div', 'run-foot');
+      foot.appendChild(link('report/index.html', 'Ouvrir le rapport Playwright'));
+      foot.appendChild(link(r.runUrl || ACTIONS_URL, 'Voir l’exécution sur GitHub'));
+      box.appendChild(foot);
+
+      setStatus(ok ? 'Réussi' : 'En échec', ok ? 'passed' : 'failed');
+      if (statTests) statTests.textContent = String(total);
     }
 
     fetch('results/summary.json', { cache: 'no-store' })
